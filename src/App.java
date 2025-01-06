@@ -10,7 +10,7 @@ public class App extends Application {
         HomeView homeView = new HomeView();
 
         // Set the scene with the HomeView as the root
-        Scene scene = new Scene(homeView.getRoot(), 400, 200);
+        Scene scene = new Scene(homeView.getRoot(), 1200, 600);
         primaryStage.setTitle("My JavaFX App");
         primaryStage.setScene(scene);
         primaryStage.show();
