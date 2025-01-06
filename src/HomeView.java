@@ -1,8 +1,14 @@
+
+import java.math.BigDecimal;
+
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -11,9 +17,11 @@ import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.StackPane;
 
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javax.print.attribute.standard.DateTimeAtCreation;
 import javax.swing.text.Position;
 
 public class HomeView {
@@ -22,7 +30,13 @@ public class HomeView {
     private TextField nameField = new TextField();
     private TextField amountField = new TextField();
     private DatePicker dateField = new DatePicker();
-    public HomeView() {
+
+    private Controller controller;
+    private Model model;
+    public HomeView(Controller c, Model m) {
+        controller = c;
+        model = m;
+
         root = new GridPane();
         for(int i = 0; i < 5; i++){
             RowConstraints row = new RowConstraints();
@@ -50,6 +64,7 @@ public class HomeView {
 
         addIncomeButton.setAlignment(Pos.CENTER);
         addIncomeButton.setText("Add Income");
+        addIncomeButton.setOnAction(event -> AddIncome());
 
         addExpenseButton.setAlignment(Pos.CENTER);
         addExpenseButton.setText("Add Expense");
@@ -69,6 +84,18 @@ public class HomeView {
         nameField.setPromptText("Enter name of Expense/Income here");
 
         amountField.setPromptText("Enter amount here");
+        amountField.addEventFilter(KeyEvent.KEY_TYPED, event -> {
+            String currentText = amountField.getText();
+            // Allow only digits and one decimal point
+            if (!event.getCharacter().matches("[0-9.]")) {
+                event.consume();  // Prevent invalid characters from being entered
+            }
+
+            // Ensure there's only one decimal point
+            if (currentText.contains(".") && event.getCharacter().equals(".")) {
+                event.consume();  // Prevent more than one decimal point
+            }
+        });
 
         HBox.setHgrow(nameField, Priority.ALWAYS);
         HBox.setHgrow(amountField, Priority.ALWAYS);
@@ -76,6 +103,44 @@ public class HomeView {
 
         textFields.getChildren().addAll(nameField, amountField, dateField);
         return textFields;
+    }
+
+    private void AddIncome(){
+        if(CheckFields()){
+            try{
+            BigDecimal amount = new BigDecimal(amountField.getText());
+            controller.AddIncome(new CommonIncome(nameField.getText(), dateField.getValue(), amount));
+            }
+            catch(NumberFormatException e){
+                showErrorMessage("Amount not in correct format");
+            }
+        }
+    }
+
+    private boolean CheckFields(){
+        if(nameField.getText() == null || nameField.getText().length() <= 0){
+            showErrorMessage("No name entered. Add a name");
+            return false;
+        }
+        if(amountField.getText() == null || amountField.getText().length() <= 0){
+            showErrorMessage("No amount entered. Enter an amount");
+            return false;
+        }
+        if(dateField.getValue().toString().length() <= 0){
+            showErrorMessage("No date entered. Enter a Date");
+            return false;
+        }
+
+        return true;
+    }
+
+    private void showErrorMessage(String message){
+        Alert alert = new Alert(AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText("Invalid Input");
+        alert.setContentText(message);
+
+        alert.showAndWait();
     }
     public GridPane getRoot() {
         return root;

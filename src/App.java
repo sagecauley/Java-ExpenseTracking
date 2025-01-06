@@ -6,8 +6,11 @@ public class App extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+        Model m = new Model();
+        Controller c = new Controller(m);
+        
         // Create the HomeView and set it as the scene's root
-        HomeView homeView = new HomeView();
+        HomeView homeView = new HomeView(c, m);
 
         // Set the scene with the HomeView as the root
         Scene scene = new Scene(homeView.getRoot(), 1200, 600);
