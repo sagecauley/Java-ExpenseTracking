@@ -1,15 +1,16 @@
 import java.math.BigDecimal;
 import java.sql.Date;
+import java.time.LocalDate;
 
 public class CommonExpense implements ExpenseInterface{
     private String name = null;
-    private Date date = null;
+    private LocalDate date = null;
     private BigDecimal amount = null;
 
     /*
     This will take in a name, date, and amount for the expense
      */
-    public CommonExpense(String n, Date d, BigDecimal a){
+    public CommonExpense(String n, LocalDate d, BigDecimal a){
         name = n;
         date = d;
         amount = a;
@@ -21,7 +22,7 @@ public class CommonExpense implements ExpenseInterface{
     }
 
     @Override
-    public Date getDate(){
+    public LocalDate getDate(){
         return date;
     }
 

@@ -1,8 +1,8 @@
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDate;
 
 public interface IncomeInterface {
     String getName();
     BigDecimal getAmount();
-    Date getDate();
+    LocalDate getDate();
 }

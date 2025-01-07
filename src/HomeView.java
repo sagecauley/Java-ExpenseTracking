@@ -7,7 +7,10 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
@@ -16,6 +19,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.StackPane;
 
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
@@ -23,6 +27,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javax.print.attribute.standard.DateTimeAtCreation;
 import javax.swing.text.Position;
+import javax.swing.text.TableView;
 
 public class HomeView {
     private GridPane root;
@@ -30,6 +35,9 @@ public class HomeView {
     private TextField nameField = new TextField();
     private TextField amountField = new TextField();
     private DatePicker dateField = new DatePicker();
+
+    private TableView<IncomeInterface> incomeTable = new TableView<IncomeInterface>();
+    private TableView<ExpenseInterface> expenseTable = new TableView<ExpenseInterface>();
 
     private Controller controller;
     private Model model;
@@ -68,10 +76,21 @@ public class HomeView {
 
         addExpenseButton.setAlignment(Pos.CENTER);
         addExpenseButton.setText("Add Expense");
+        addExpenseButton.setOnAction(event -> AddExpense());
 
         root.add(addIncomeButton, 1, 4);
         root.add(addExpenseButton, 4, 4);
-        
+
+        //Adding tables
+        incomeTable = CreateIncomeTable();
+        FillInIncomeTable();
+        expenseTable = CreateExpenseTable();
+        FillInExpenseTable();
+        GridPane.setHgrow(incomeTable, Priority.ALWAYS);
+        GridPane.setHgrow(expenseTable, Priority.ALWAYS);
+        root.add(incomeTable, 0, 0, 2, 3);
+        root.add(expenseTable, 3, 0, 2, 3);
+
     }
 
     private HBox makeTextFields(){
@@ -110,6 +129,19 @@ public class HomeView {
             try{
             BigDecimal amount = new BigDecimal(amountField.getText());
             controller.AddIncome(new CommonIncome(nameField.getText(), dateField.getValue(), amount));
+            FillInIncomeTable();
+            }
+            catch(NumberFormatException e){
+                showErrorMessage("Amount not in correct format");
+            }
+        }
+    }
+    private void AddExpense(){
+        if(CheckFields()){
+            try{
+            BigDecimal amount = new BigDecimal(amountField.getText());
+            controller.AddExpense(new CommonExpense(nameField.getText(), dateField.getValue(), amount));
+            FillInExpenseTable();
             }
             catch(NumberFormatException e){
                 showErrorMessage("Amount not in correct format");
@@ -134,6 +166,18 @@ public class HomeView {
         return true;
     }
 
+    private void FillInIncomeTable(){
+        incomeTable.getItems().clear();
+        for(CommonIncome i: model.incomeList){
+            incomeTable.getItems().add(i);
+        }
+    }
+    private void FillInExpenseTable(){
+        expenseTable.getItems().clear();
+        for(CommonExpense e: model.expenseList){
+            expenseTable.getItems().add(e);
+        }
+    }
     private void showErrorMessage(String message){
         Alert alert = new Alert(AlertType.ERROR);
         alert.setTitle("Error");
@@ -141,6 +185,48 @@ public class HomeView {
         alert.setContentText(message);
 
         alert.showAndWait();
+    }
+
+    private TableView<IncomeInterface> CreateIncomeTable(){
+        TableView<IncomeInterface> iTable = new TableView<IncomeInterface>();
+
+        TableColumn<IncomeInterface, String> nameColumn = new TableColumn<>("Name");
+        TableColumn<IncomeInterface, BigDecimal> amountColumn = new TableColumn<>("Amount");
+        TableColumn<IncomeInterface, LocalDate> dateColumn = new TableColumn<>("Date");
+
+        
+
+        nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+        amountColumn.setCellValueFactory(new PropertyValueFactory<>("amount"));
+        dateColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
+
+        nameColumn.setMinWidth(150);
+        amountColumn.setMinWidth(100);
+        dateColumn.setMinWidth(150);
+
+        iTable.getColumns().addAll(nameColumn, amountColumn, dateColumn);
+
+        return iTable;
+    }
+
+    private TableView<ExpenseInterface> CreateExpenseTable(){
+        TableView<ExpenseInterface> eTable = new TableView<ExpenseInterface>();
+
+        TableColumn<ExpenseInterface, String> nameColumn = new TableColumn<>("Name");
+        TableColumn<ExpenseInterface, BigDecimal> amountColumn = new TableColumn<>("Amount");
+        TableColumn<ExpenseInterface, LocalDate> dateColumn = new TableColumn<>("Date");
+
+        nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+        amountColumn.setCellValueFactory(new PropertyValueFactory<>("amount"));
+        dateColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
+
+        nameColumn.setMinWidth(150);
+        amountColumn.setMinWidth(100);
+        dateColumn.setMinWidth(150);
+
+        eTable.getColumns().addAll(nameColumn, amountColumn, dateColumn);
+
+        return eTable;
     }
     public GridPane getRoot() {
         return root;

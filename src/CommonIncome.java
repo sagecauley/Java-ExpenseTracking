@@ -22,7 +22,7 @@ public class CommonIncome implements IncomeInterface{
     }
 
     @Override
-    public Date getDate(){
+    public LocalDate getDate(){
         return date;
     }
 
