@@ -1,15 +1,16 @@
 import java.math.BigDecimal;
 import java.sql.Date;
+import java.time.LocalDate;
 
 public class CommonIncome implements IncomeInterface{
     private String name = null;
-    private Date date = null;
+    private LocalDate date = null;
     private BigDecimal amount = null;
 
     /*
     This will take in a name, date, and amount for the income
      */
-    public CommonIncome(String n, Date d, BigDecimal a){
+    public CommonIncome(String n, LocalDate d, BigDecimal a){
         name = n;
         date = d;
         amount = a;
@@ -21,7 +22,7 @@ public class CommonIncome implements IncomeInterface{
     }
 
     @Override
-    public Date getDate(){
+    public LocalDate getDate(){
         return date;
     }
 
